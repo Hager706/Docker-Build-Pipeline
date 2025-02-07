@@ -1,8 +1,7 @@
 pipeline {
     agent {
-        docker {
-            image 'docker:latest'  // Use the Docker CLI image
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'  // Mount Docker socket
+        node {
+            label 'docker-agent' // Make sure the agent label matches the Jenkins node label
         }
     }
 
