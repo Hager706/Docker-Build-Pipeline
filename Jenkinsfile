@@ -1,9 +1,6 @@
 pipeline {
     agent {
-        docker {
-            image 'docker:24.0.7'
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-        }
+        label 'docker-agent' // This should match your Jenkins agent label
     }
     environment {
         DOCKER_IMAGE = "hagert/node-app"
