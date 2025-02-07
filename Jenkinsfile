@@ -1,11 +1,11 @@
 pipeline {
     agent {
-        label 'docker-agent' // This should match your Jenkins agent label
+        label 'docker-agent' 
     }
     environment {
         DOCKER_IMAGE = "hagert/node-app"
         DOCKER_TAG = "latest"
-        REGISTRY_CREDENTIALS = "docker-hub-credentials"
+        REGISTRY_CREDENTIALS = "docker hub"
     }
     stages {
         stage('Checkout') {
