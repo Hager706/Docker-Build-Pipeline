@@ -1,38 +1,32 @@
+
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest'  
-            args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent { label 'docker' }  
     environment {
-        DOCKER_HUB_USER = credentials('docker')  
-        IMAGE_NAME = 'hagert/app'
+        IMAGE_NAME = "hagert/app"
+        TAG = "latest"
+        DOCKER_CREDENTIALS_ID = "docker"
     }
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Hager706/Docker-Build-Pipeline.git'
+                git url: 'https://github.com/Hager706/Docker-Build-Pipeline.git', branch: 'main'
             }
         }
-        stage('Build Docker Image') {
+        stage('Build Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME .'
-            }
-        }
-        stage('Tag Docker Image') {
-            steps {
-                sh 'docker tag $IMAGE_NAME $IMAGE_NAME:latest'
+                sh 'docker build -t $IMAGE_NAME:$TAG .'
             }
         }
         stage('Login to Docker Hub') {
             steps {
-                sh 'echo $DOCKER_HUB_USER_PSW | docker login -u $DOCKER_HUB_USER --password-stdin'
+                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
             }
         }
-        stage('Push Image to Docker Hub') {
+        stage('Push Image') {
             steps {
-                sh 'docker push $IMAGE_NAME:latest'
+                sh 'docker push $IMAGE_NAME:$TAG'
             }
         }
     }
