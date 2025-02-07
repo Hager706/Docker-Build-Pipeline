@@ -7,7 +7,7 @@ pipeline {
     }
     environment {
         DOCKER_HUB_USER = credentials('docker')  
-        IMAGE_NAME = 'hagert/redis'
+        IMAGE_NAME = 'hagert/app'
     }
     stages {
         stage('Checkout Code') {
