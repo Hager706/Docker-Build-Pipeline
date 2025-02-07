@@ -7,7 +7,6 @@ pipeline {
     }
     
     environment {
-        DOCKERHUB_USER = credentials('docker')  
         IMAGE_NAME = 'hagert/node-app'
         IMAGE_TAG = 'latest'
         GIT_REPO = 'https://github.com/Hager706/Docker-Build-Pipeline.git'
@@ -29,8 +28,11 @@ pipeline {
         }
         
         stage('Login to Docker Hub') {
+            environment {
+                DOCKER_CREDENTIALS = credentials('docker hub')  
+            }
             steps {
-                sh 'echo $DOCKERHUB_USER_PSW | docker login -u $DOCKERHUB_USER_USR --password-stdin'
+                sh 'echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
             }
         }
         
