@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'hagert/jenkins-agent:latest'
+            image 'docker:dind'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
             label 'docker-agent'
         }
