@@ -1,9 +1,9 @@
 pipeline {
     agent {
         docker {
-            image 'hagert/jenkins-agent:latest' 
+            image 'hagert/jenkins-agent:latest'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
-            label 'docker-agent' 
+            label 'docker-agent'
         }
     }
     environment {
@@ -13,10 +13,21 @@ pipeline {
         GIT_CREDENTIALS = "github"
     }
     stages {
+        stage('Check Docker Installation') {
+            steps {
+                script {
+                    try {
+                        sh 'docker --version'
+                    } catch (Exception e) {
+                        error "Docker is not installed or not accessible. Please ensure Docker is installed and the Jenkins user has permissions to use it."
+                    }
+                }
+            }
+        }
         stage('Checkout') {
             steps {
-                git branch: 'main', 
-                    credentialsId: GIT_CREDENTIALS, 
+                git branch: 'main',
+                    credentialsId: GIT_CREDENTIALS,
                     url: 'https://github.com/Hager706/Docker-Build-Pipeline.git'
             }
         }
