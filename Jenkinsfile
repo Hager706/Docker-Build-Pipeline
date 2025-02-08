@@ -1,11 +1,12 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:dind'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-            label 'docker-agent'
-        }
+   agent {
+    docker {
+        image 'jenkins/agent'
+        args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
+        label 'docker-agent'
     }
+}
+
     environment {
         DOCKER_IMAGE = "hagert/node-app"
         DOCKER_TAG = "latest"
@@ -62,6 +63,7 @@ pipeline {
 //docker stop jenkins-agent && docker rm jenkins-agent
 // docker run -d \
 //   --name jenkins-agent \
+//   --network jenkins \
 //   -v /var/run/docker.sock:/var/run/docker.sock \
 //   -e JENKINS_URL=http://jenkins:8080\
 //   -e JENKINS_SECRET=f07f90a1a217b0da15c5f0cf3b91d1047243652ec8ba1459bb481411fa3974c9 \
