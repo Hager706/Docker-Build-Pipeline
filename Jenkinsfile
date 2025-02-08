@@ -1,10 +1,9 @@
-
 pipeline {
     agent {
         docker {
-            image 'docker:latest' // Use Docker-in-Docker image
+            image 'hagert/jenkins-agent:latest' 
             args '-v /var/run/docker.sock:/var/run/docker.sock'
-            label 'docker-agent' // Ensure this label matches your Jenkins agent configuration
+            label 'docker-agent' 
         }
     }
     environment {
