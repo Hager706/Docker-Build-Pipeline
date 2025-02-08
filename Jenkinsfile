@@ -1,5 +1,7 @@
 pipeline {
     agent {
+        image 'docker:dind' // Use Docker-in-Docker image
+        args '-v /var/run/docker.sock:/var/run/docker.sock'
         label 'docker-agent' 
     }
     environment {
