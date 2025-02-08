@@ -1,8 +1,11 @@
+
 pipeline {
     agent {
-        image 'docker:dind' // Use Docker-in-Docker image
-        args '-v /var/run/docker.sock:/var/run/docker.sock'
-        label 'docker-agent' 
+        docker {
+            image 'docker:dind' // Use Docker-in-Docker image
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            label 'docker-agent' // Ensure this label matches your Jenkins agent configuration
+        }
     }
     environment {
         DOCKER_IMAGE = "hagert/node-app"
