@@ -1,13 +1,13 @@
 pipeline {
     agent {
         docker {
-            image 'docker:latest' 
-            args '-v /var/run/docker.sock:/var/run/docker.sock' 
+            image 'docker:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -u root'  // Run as root user
         }
     }
     environment {
-        DOCKER_REGISTRY = 'docker.io' 
-        DOCKER_REPO = 'hagert/node-app' 
+        DOCKER_REGISTRY = 'docker.io'
+        DOCKER_REPO = 'hagert/node-app'
         DOCKER_IMAGE_TAG = 'latest'
     }
     stages {
