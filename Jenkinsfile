@@ -1,53 +1,52 @@
 pipeline {
-   agent {
-    docker {
-        image 'jenkins/agent'
-        args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-        label 'docker-agent'
+    agent {
+        docker {
+            image 'docker:latest' 
+            args '-v /var/run/docker.sock:/var/run/docker.sock' 
+        }
     }
-}
-
     environment {
-        DOCKER_IMAGE = "hagert/node-app"
-        DOCKER_TAG = "latest"
-        REGISTRY_CREDENTIALS = "dockerhub"
-        GIT_CREDENTIALS = "github"
+        DOCKER_REGISTRY = 'docker.io' 
+        DOCKER_REPO = 'hagert/node-app' 
+        DOCKER_IMAGE_TAG = 'latest'
     }
     stages {
-        stage('Check Docker Installation') {
-            steps {
-                script {
-                    try {
-                        sh 'docker --version'
-                    } catch (Exception e) {
-                        error "Docker is not installed or not accessible. Please ensure Docker is installed and the Jenkins user has permissions to use it."
-                    }
-                }
-            }
-        }
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: GIT_CREDENTIALS,
-                    url: 'https://github.com/Hager706/Docker-Build-Pipeline.git'
+                git branch: 'main', url: 'https://github.com/Hager706/Docker-Build-Pipeline.git'
             }
         }
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE:$DOCKER_TAG .'
-            }
-        }
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: REGISTRY_CREDENTIALS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
+                script {
+                    dockerImage = docker.build("${DOCKER_REPO}:${DOCKER_IMAGE_TAG}", ".")
                 }
             }
         }
-        stage('Push Image to Docker Hub') {
+        stage('Tag Docker Image') {
             steps {
-                sh 'docker push $DOCKER_IMAGE:$DOCKER_TAG'
+                script {
+                    dockerImage.tag("${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_IMAGE_TAG}")
+                }
             }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh "echo ${DOCKER_PASSWORD} | docker login ${DOCKER_REGISTRY} -u ${DOCKER_USER} --password-stdin"
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Docker image built, tagged, and pushed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
@@ -73,3 +72,4 @@ pipeline {
 //  git push origin main   
 //  git commit -m "finishing" 
 //  git add .    
+
