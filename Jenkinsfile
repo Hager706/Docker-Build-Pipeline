@@ -49,7 +49,7 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
-}
+
 // docker run -d \                                     
 //   --name jenkins-agent \
 //   --network jenkins \
