@@ -26,7 +26,7 @@ pipeline {
         stage('Tag Docker Image') {
             steps {
                 script {
-                    dockerImage.tag("${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_IMAGE_TAG}")
+                    sh "docker tag ${DOCKER_REPO}:${DOCKER_IMAGE_TAG} ${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_IMAGE_TAG}"
                 }
             }
         }
@@ -34,8 +34,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASSWORD')]) {
-                     sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
-}
+                        sh 'echo $DOCKER_HUB_PASSWORD | docker login -u $DOCKER_HUB_USER --password-stdin'
+                        sh "docker push ${DOCKER_REGISTRY}/${DOCKER_REPO}:${DOCKER_IMAGE_TAG}"
                     }
                 }
             }
@@ -49,6 +49,7 @@ pipeline {
             echo 'Pipeline failed!'
         }
     }
+}
 
 // docker run -d \                                     
 //   --name jenkins-agent \
